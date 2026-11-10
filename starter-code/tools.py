@@ -30,7 +30,7 @@ def search_product_catalog(category: str, max_price: int = 999999999999) -> List
 
     results = [
         p for p in products
-        if p["category"].lower() == category.lower()
+        if p["category"].lower() == category.lower().strip()
         and p["price_vnd"] <= max_price
     ]
     return results
@@ -56,6 +56,10 @@ def submit_support_ticket(
     Returns:
         Thông tin ticket vừa tạo bao gồm ticket_id, status.
     """
+    if not customer_name.strip() or not issue_description.strip():
+        return ("error": "Customer name and issue description cannot be empty.")
+    if priority not in ["low", "medium", "high"]:
+        priority = "medium"
     tickets_file = os.path.join(RAW_DATA_DIR, "support_tickets.json")
 
     # Load existing tickets
@@ -103,7 +107,7 @@ def submit_support_ticket(
 TOOL_DEFINITIONS = [
     {
         "name": "search_product_catalog",
-        "description": "Tra cứu sản phẩm/dịch vụ Vingroup (xe điện VinFast, resort Vinpearl) theo danh mục và giá tối đa.",
+        "description": "Tra cứu sản phẩm/dịch vụ Vingroup (xe điện VinFast, resort Vinpearl) theo danh mục và giá tối đa. Không dùng khi khách hàng hỏi câu FAQ đơn giản, khách hàng khiếu nại, hoặc cần tạo ticket.",
         "parameters": {
             "type": "object",
             "properties": {
